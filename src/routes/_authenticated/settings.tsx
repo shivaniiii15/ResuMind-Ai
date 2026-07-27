@@ -4,7 +4,7 @@ import { toast } from "sonner";
 import { Loader2, Upload, Camera, Moon, Sun } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
-import { useProfile, useUpdateProfile } from "@/hooks/use-finance";
+import { useProfile, useUpdateProfile } from "@/hooks/use-profile";
 import { useTheme } from "@/lib/theme";
 import { useSignedAvatar } from "@/hooks/use-signed-avatar";
 import { CURRENCIES } from "@/lib/constants";

@@ -21,7 +21,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { useAnalysisReports, useDeleteReport } from "@/hooks/use-resumes";
-import { useProfile, useUpdateProfile } from "@/hooks/use-finance";
+import { useProfile, useUpdateProfile } from "@/hooks/use-profile";
 import type { AnalysisReport } from "@/types/resume";
 import { toast } from "sonner";
 
