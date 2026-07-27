@@ -14,6 +14,66 @@ export type Database = {
   }
   public: {
     Tables: {
+      analysis_reports: {
+        Row: {
+          ats_score: number
+          created_at: string
+          file_name: string
+          formatting_suggestions: Json
+          grammar_suggestions: Json
+          id: string
+          missing_keywords: Json
+          page_count: number
+          parsed_text: string | null
+          resume_score: number
+          skills_detected: Json
+          strengths: Json
+          summary: string | null
+          targeted_role: string | null
+          user_id: string
+          weaknesses: Json
+          word_count: number
+        }
+        Insert: {
+          ats_score: number
+          created_at?: string
+          file_name: string
+          formatting_suggestions?: Json
+          grammar_suggestions?: Json
+          id?: string
+          missing_keywords?: Json
+          page_count?: number
+          parsed_text?: string | null
+          resume_score: number
+          skills_detected?: Json
+          strengths?: Json
+          summary?: string | null
+          targeted_role?: string | null
+          user_id: string
+          weaknesses?: Json
+          word_count?: number
+        }
+        Update: {
+          ats_score?: number
+          created_at?: string
+          file_name?: string
+          formatting_suggestions?: Json
+          grammar_suggestions?: Json
+          id?: string
+          missing_keywords?: Json
+          page_count?: number
+          parsed_text?: string | null
+          resume_score?: number
+          skills_detected?: Json
+          strengths?: Json
+          summary?: string | null
+          targeted_role?: string | null
+          user_id?: string
+          weaknesses?: Json
+          word_count?: number
+        }
+        Relationships: []
+      }
       budgets: {
         Row: {
           created_at: string
@@ -41,6 +101,114 @@ export type Database = {
           updated_at?: string
           user_id?: string
           year?: number
+        }
+        Relationships: []
+      }
+      cover_letters: {
+        Row: {
+          company_name: string
+          content: string
+          created_at: string
+          id: string
+          job_description: string | null
+          job_title: string
+          tone: string
+          user_id: string
+        }
+        Insert: {
+          company_name: string
+          content: string
+          created_at?: string
+          id?: string
+          job_description?: string | null
+          job_title: string
+          tone?: string
+          user_id: string
+        }
+        Update: {
+          company_name?: string
+          content?: string
+          created_at?: string
+          id?: string
+          job_description?: string | null
+          job_title?: string
+          tone?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      job_matches: {
+        Row: {
+          company_name: string
+          created_at: string
+          id: string
+          improvement_suggestions: Json
+          job_description: string
+          job_title: string
+          match_percentage: number
+          matched_keywords: Json
+          matching_skills: Json
+          missing_keywords: Json
+          missing_skills: Json
+          tailored_summary: string | null
+          user_id: string
+        }
+        Insert: {
+          company_name: string
+          created_at?: string
+          id?: string
+          improvement_suggestions?: Json
+          job_description: string
+          job_title: string
+          match_percentage: number
+          matched_keywords?: Json
+          matching_skills?: Json
+          missing_keywords?: Json
+          missing_skills?: Json
+          tailored_summary?: string | null
+          user_id: string
+        }
+        Update: {
+          company_name?: string
+          created_at?: string
+          id?: string
+          improvement_suggestions?: Json
+          job_description?: string
+          job_title?: string
+          match_percentage?: number
+          matched_keywords?: Json
+          matching_skills?: Json
+          missing_keywords?: Json
+          missing_skills?: Json
+          tailored_summary?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      resumes: {
+        Row: {
+          created_at: string
+          data: Json
+          id: string
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          data?: Json
+          id?: string
+          title?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          data?: Json
+          id?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }

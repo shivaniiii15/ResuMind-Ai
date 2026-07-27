@@ -81,27 +81,22 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Smart Expense Tracker — Track Income, Budgets & Savings" },
+      { title: "ResuMind AI — Smart ATS Resume Analyzer & AI Resume Builder" },
       {
         name: "description",
         content:
-          "Smart Expense Tracker helps you track income and expenses, set budgets, visualize spending with charts, and reach your savings goals.",
+          "Optimize your resume for Applicant Tracking Systems (ATS), match job descriptions, generate tailored cover letters, and build high-converting engineering resumes with AI.",
       },
-      { name: "author", content: "Smart Expense Tracker" },
-      { property: "og:title", content: "Smart Expense Tracker — Track Income, Budgets & Savings" },
+      { name: "author", content: "ResuMind AI" },
+      { property: "og:title", content: "ResuMind AI — Smart ATS Resume Analyzer & AI Resume Builder" },
       {
         property: "og:description",
         content:
-          "Track income and expenses, set budgets, and reach your savings goals with beautiful analytics.",
+          "Scan your resume against real recruiter ATS filters, identify missing skills, compare with job descriptions, and generate tailored cover letters in seconds.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "Smart Expense Tracker — Track Income, Budgets & Savings" },
-      { name: "description", content: "Smart Money Manager is a full-stack web application for tracking income and expenses." },
-      { property: "og:description", content: "Smart Money Manager is a full-stack web application for tracking income and expenses." },
-      { name: "twitter:description", content: "Smart Money Manager is a full-stack web application for tracking income and expenses." },
-      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/996e2f9b-f3ca-46b8-aef6-b856631006bc/id-preview-8bfdd203--9f54a575-ee71-47cc-b5c0-14a5429bb37d.lovable.app-1782361188144.png" },
-      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/996e2f9b-f3ca-46b8-aef6-b856631006bc/id-preview-8bfdd203--9f54a575-ee71-47cc-b5c0-14a5429bb37d.lovable.app-1782361188144.png" },
+      { name: "twitter:title", content: "ResuMind AI — Smart ATS Resume Analyzer & AI Resume Builder" },
     ],
     links: [{ rel: "stylesheet", href: appCss }],
   }),

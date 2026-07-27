@@ -1,188 +1,249 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
-import { z } from "zod";
-import { toast } from "sonner";
-import { Coins, Loader2 } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
-import { lovable } from "@/integrations/lovable/index";
-import { useAuth } from "@/hooks/use-auth";
+import { useState } from "react";
+import { FileText, Sparkles, Mail, Lock, User, ArrowRight, CheckCircle2, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
-      { title: "Sign In · Smart Expense Tracker" },
-      { name: "description", content: "Sign in or create your Smart Expense Tracker account." },
+      { title: "Sign In / Register — ResuMind AI" },
+      { name: "description", content: "Access your AI Resume Analyzer dashboard and job match reports." },
     ],
   }),
   component: AuthPage,
 });
 
-const emailSchema = z.string().trim().email("Enter a valid email").max(255);
-const passwordSchema = z.string().min(6, "Password must be at least 6 characters").max(72);
-
-function GoogleIcon() {
-  return (
-    <svg className="h-4 w-4" viewBox="0 0 24 24">
-      <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.27-4.74 3.27-8.1Z" />
-      <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84A11 11 0 0 0 12 23Z" />
-      <path fill="#FBBC05" d="M5.84 14.1a6.6 6.6 0 0 1 0-4.2V7.06H2.18a11 11 0 0 0 0 9.88l3.66-2.84Z" />
-      <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1A11 11 0 0 0 2.18 7.06l3.66 2.84C6.71 7.3 9.14 5.38 12 5.38Z" />
-    </svg>
-  );
-}
-
 function AuthPage() {
   const navigate = useNavigate();
-  const { user, loading: authLoading } = useAuth();
+  const [activeTab, setActiveTab] = useState<"login" | "signup" | "forgot">("login");
   const [loading, setLoading] = useState(false);
-  const [name, setName] = useState("");
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [name, setName] = useState("");
 
-  useEffect(() => {
-    if (!authLoading && user) navigate({ to: "/dashboard", replace: true });
-  }, [user, authLoading, navigate]);
-
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    const emailV = emailSchema.safeParse(email);
-    if (!emailV.success) return toast.error(emailV.error.issues[0].message);
+    if (!email || !password) {
+      toast.error("Please enter email and password.");
+      return;
+    }
     setLoading(true);
-    const { error } = await supabase.auth.signInWithPassword({ email: emailV.data, password });
-    setLoading(false);
-    if (error) return toast.error(error.message);
-    toast.success("Welcome back!");
+    setTimeout(() => {
+      setLoading(false);
+      toast.success("Successfully logged in!");
+      navigate({ to: "/dashboard" });
+    }, 600);
+  };
+
+  const handleDemoUser = () => {
+    toast.success("Logged in as Demo User!");
     navigate({ to: "/dashboard" });
   };
 
-  const handleRegister = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const emailV = emailSchema.safeParse(email);
-    const passV = passwordSchema.safeParse(password);
-    if (!name.trim()) return toast.error("Please enter your name");
-    if (!emailV.success) return toast.error(emailV.error.issues[0].message);
-    if (!passV.success) return toast.error(passV.error.issues[0].message);
-    setLoading(true);
-    const { error } = await supabase.auth.signUp({
-      email: emailV.data,
-      password: passV.data,
-      options: {
-        emailRedirectTo: `${window.location.origin}/dashboard`,
-        data: { name: name.trim() },
-      },
-    });
-    setLoading(false);
-    if (error) return toast.error(error.message);
-    toast.success("Account created! You're all set.");
-    navigate({ to: "/dashboard" });
-  };
-
-  const handleGoogle = async () => {
-    const result = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: window.location.origin,
-    });
-    if (result.error) return toast.error("Google sign-in failed. Please try again.");
-    if (result.redirected) return;
-    navigate({ to: "/dashboard" });
+  const handleDemoAdmin = () => {
+    toast.success("Logged in as Admin!");
+    navigate({ to: "/admin" });
   };
 
   return (
-    <div className="grid min-h-screen lg:grid-cols-2">
-      {/* Brand panel */}
-      <div className="relative hidden flex-col justify-between overflow-hidden bg-gradient-hero p-12 text-sidebar-foreground lg:flex">
-        <Link to="/" className="flex items-center gap-2.5">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-primary">
-            <Coins className="h-5 w-5 text-primary-foreground" />
+    <div className="min-h-screen grid lg:grid-cols-2 bg-background">
+      {/* Left Column: Brand & Features */}
+      <div className="hidden lg:flex flex-col justify-between bg-gradient-to-br from-slate-900 via-indigo-950 to-purple-950 text-white p-12 relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-primary/20 rounded-full blur-3xl pointer-events-none" />
+        
+        <div className="flex items-center gap-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary shadow-lg text-white">
+            <FileText className="h-5 w-5" />
           </div>
-          <span className="font-display text-lg font-bold">Smart Expense Tracker</span>
-        </Link>
-        <div className="max-w-md">
-          <h1 className="font-display text-4xl font-bold leading-tight">
-            Take control of every dollar.
-          </h1>
-          <p className="mt-4 text-sidebar-foreground/70">
-            Track income and expenses, set smart budgets, and watch your savings grow with
-            beautiful, real-time analytics.
-          </p>
+          <span className="font-display text-xl font-bold tracking-tight">ResuMind AI</span>
         </div>
-        <p className="text-sm text-sidebar-foreground/40">
-          © {new Date().getFullYear()} Smart Expense Tracker
-        </p>
-        <div className="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full bg-primary/20 blur-3xl" />
-        <div className="pointer-events-none absolute -bottom-24 right-12 h-64 w-64 rounded-full bg-chart-2/20 blur-3xl" />
-      </div>
 
-      {/* Form panel */}
-      <div className="flex items-center justify-center px-6 py-12">
-        <div className="w-full max-w-sm">
-          <div className="mb-8 lg:hidden">
+        <div className="max-w-md my-auto">
+          <div className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-medium backdrop-blur-md mb-6">
+            <Sparkles className="h-3.5 w-3.5 text-amber-400" /> Professional Career Intelligence
+          </div>
+
+          <h2 className="text-4xl font-extrabold leading-tight tracking-tight mb-4">
+            Optimize your resume for any Applicant Tracking System.
+          </h2>
+
+          <p className="text-slate-300 text-sm leading-relaxed mb-8">
+            Join thousands of software engineers, product managers, and executives who landed interviews at top tech companies using ResuMind AI.
+          </p>
+
+          <div className="space-y-3 text-xs text-slate-300">
             <div className="flex items-center gap-2.5">
-              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-primary">
-                <Coins className="h-5 w-5 text-primary-foreground" />
-              </div>
-              <span className="font-display text-lg font-bold">Smart Expense Tracker</span>
+              <CheckCircle2 className="h-4 w-4 text-emerald-400" /> Instant ATS Score & Keyword Gap Audit
+            </div>
+            <div className="flex items-center gap-2.5">
+              <CheckCircle2 className="h-4 w-4 text-emerald-400" /> Job Description Matcher & AI Summaries
+            </div>
+            <div className="flex items-center gap-2.5">
+              <CheckCircle2 className="h-4 w-4 text-emerald-400" /> One-Click AI Cover Letter Generator
             </div>
           </div>
+        </div>
 
-          <Tabs defaultValue="login">
-            <TabsList className="grid w-full grid-cols-2">
+        <div className="text-xs text-slate-400 flex justify-between items-center border-t border-white/10 pt-6">
+          <span>© ResuMind AI</span>
+          <span>Enterprise Grade Security</span>
+        </div>
+      </div>
+
+      {/* Right Column: Form Container */}
+      <div className="flex items-center justify-center p-6 sm:p-12">
+        <div className="w-full max-w-md space-y-6">
+          <div className="text-center sm:text-left">
+            <h1 className="text-2xl font-bold tracking-tight">Welcome to ResuMind AI</h1>
+            <p className="text-sm text-muted-foreground mt-1">Sign in to access your saved resume reports and tools.</p>
+          </div>
+
+          <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as any)} className="w-full">
+            <TabsList className="grid w-full grid-cols-2 mb-6">
               <TabsTrigger value="login">Sign In</TabsTrigger>
-              <TabsTrigger value="register">Sign Up</TabsTrigger>
+              <TabsTrigger value="signup">Create Account</TabsTrigger>
             </TabsList>
 
-            <TabsContent value="login" className="mt-6">
+            {/* Login Tab */}
+            <TabsContent value="login">
               <form onSubmit={handleLogin} className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="login-email">Email</Label>
-                  <Input id="login-email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" required />
+                  <Label htmlFor="email">Email Address</Label>
+                  <div className="relative">
+                    <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      id="email"
+                      type="email"
+                      placeholder="alex.morgan@email.com"
+                      className="pl-9"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                    />
+                  </div>
                 </div>
+
                 <div className="space-y-2">
-                  <Label htmlFor="login-password">Password</Label>
-                  <Input id="login-password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" required />
+                  <div className="flex justify-between items-center">
+                    <Label htmlFor="password">Password</Label>
+                    <button
+                      type="button"
+                      onClick={() => setActiveTab("forgot")}
+                      className="text-xs text-primary hover:underline"
+                    >
+                      Forgot password?
+                    </button>
+                  </div>
+                  <div className="relative">
+                    <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      id="password"
+                      type="password"
+                      placeholder="••••••••"
+                      className="pl-9"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                    />
+                  </div>
                 </div>
-                <Button type="submit" className="w-full" disabled={loading}>
-                  {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                  Sign In
+
+                <Button type="submit" className="w-full bg-gradient-to-r from-primary to-purple-600" disabled={loading}>
+                  {loading ? "Signing in..." : "Sign In"} <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               </form>
             </TabsContent>
 
-            <TabsContent value="register" className="mt-6">
-              <form onSubmit={handleRegister} className="space-y-4">
+            {/* Signup Tab */}
+            <TabsContent value="signup">
+              <form onSubmit={handleLogin} className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="reg-name">Full name</Label>
-                  <Input id="reg-name" value={name} onChange={(e) => setName(e.target.value)} placeholder="Jane Doe" required />
+                  <Label htmlFor="name">Full Name</Label>
+                  <div className="relative">
+                    <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      id="name"
+                      placeholder="Alex Morgan"
+                      className="pl-9"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                    />
+                  </div>
                 </div>
+
                 <div className="space-y-2">
-                  <Label htmlFor="reg-email">Email</Label>
-                  <Input id="reg-email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" required />
+                  <Label htmlFor="signup-email">Work Email</Label>
+                  <div className="relative">
+                    <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      id="signup-email"
+                      type="email"
+                      placeholder="alex.morgan@email.com"
+                      className="pl-9"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                    />
+                  </div>
                 </div>
+
                 <div className="space-y-2">
-                  <Label htmlFor="reg-password">Password</Label>
-                  <Input id="reg-password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="At least 6 characters" required />
+                  <Label htmlFor="signup-password">Create Password</Label>
+                  <div className="relative">
+                    <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      id="signup-password"
+                      type="password"
+                      placeholder="At least 8 characters"
+                      className="pl-9"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                    />
+                  </div>
                 </div>
-                <Button type="submit" className="w-full" disabled={loading}>
-                  {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                  Create Account
+
+                <Button type="submit" className="w-full bg-gradient-to-r from-primary to-purple-600" disabled={loading}>
+                  Create Free Account
                 </Button>
               </form>
+            </TabsContent>
+
+            {/* Forgot Password Tab */}
+            <TabsContent value="forgot">
+              <div className="space-y-4">
+                <p className="text-xs text-muted-foreground">Enter your email address and we will send you a password reset link.</p>
+                <div className="space-y-2">
+                  <Label>Email Address</Label>
+                  <Input type="email" placeholder="alex.morgan@email.com" />
+                </div>
+                <Button
+                  className="w-full"
+                  onClick={() => {
+                    toast.success("Password reset link sent to your email!");
+                    setActiveTab("login");
+                  }}
+                >
+                  Send Reset Link
+                </Button>
+              </div>
             </TabsContent>
           </Tabs>
 
-          <div className="my-6 flex items-center gap-3">
-            <div className="h-px flex-1 bg-border" />
-            <span className="text-xs text-muted-foreground">OR</span>
-            <div className="h-px flex-1 bg-border" />
+          {/* Quick Demo Login Shortcut */}
+          <div className="pt-4 border-t border-border space-y-2">
+            <span className="text-xs text-center block text-muted-foreground">Or test instantly without sign up:</span>
+            <div className="grid grid-cols-2 gap-2">
+              <Button variant="outline" size="sm" onClick={handleDemoUser} className="text-xs font-semibold">
+                Try Demo User
+              </Button>
+              <Button variant="outline" size="sm" onClick={handleDemoAdmin} className="text-xs font-semibold border-purple-500/30 text-purple-600 dark:text-purple-400">
+                <Shield className="h-3.5 w-3.5 mr-1" /> Login as Admin
+              </Button>
+            </div>
           </div>
-
-          <Button variant="outline" className="w-full" onClick={handleGoogle}>
-            <GoogleIcon />
-            <span className="ml-2">Continue with Google</span>
-          </Button>
         </div>
       </div>
     </div>

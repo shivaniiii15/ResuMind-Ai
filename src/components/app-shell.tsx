@@ -1,163 +1,173 @@
+import { Link, useNavigate, useLocation } from "@tanstack/react-router";
 import { useState, type ReactNode } from "react";
-import { Link, useRouterState, useNavigate } from "@tanstack/react-router";
 import {
+  FileText,
   LayoutDashboard,
-  ArrowLeftRight,
-  Wallet,
-  PieChart,
   Target,
   Sparkles,
-  Settings,
+  Layers,
+  User,
   Shield,
-  Menu,
-  Moon,
   Sun,
+  Moon,
   LogOut,
-  Coins,
+  Menu,
+  X,
+  UploadCircle,
+  FileCheck,
 } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
-import { useTheme } from "@/lib/theme";
-import { useProfile, useIsAdmin } from "@/hooks/use-finance";
-import { useSignedAvatar } from "@/hooks/use-signed-avatar";
-import { useQueryClient } from "@tanstack/react-query";
-import { cn } from "@/lib/utils";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet";
+import { useTheme } from "@/lib/theme";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
-const NAV = [
-  { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { to: "/transactions", label: "Transactions", icon: ArrowLeftRight },
-  { to: "/budget", label: "Budget", icon: Wallet },
-  { to: "/reports", label: "Reports", icon: PieChart },
-  { to: "/goals", label: "Savings Goals", icon: Target },
-  { to: "/insights", label: "AI Insights", icon: Sparkles },
-  { to: "/settings", label: "Settings", icon: Settings },
-] as const;
-
-function NavLinks({ onNavigate, isAdmin }: { onNavigate?: () => void; isAdmin?: boolean }) {
-  const pathname = useRouterState({ select: (s) => s.location.pathname });
-  const items = isAdmin
-    ? [...NAV, { to: "/admin", label: "Admin Panel", icon: Shield } as const]
-    : NAV;
-  return (
-    <nav className="flex flex-col gap-1 px-3">
-      {items.map((item) => {
-        const active = pathname === item.to;
-        return (
-          <Link
-            key={item.to}
-            to={item.to}
-            onClick={onNavigate}
-            className={cn(
-              "group flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
-              active
-                ? "bg-sidebar-primary text-sidebar-primary-foreground shadow-sm"
-                : "text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
-            )}
-          >
-            <item.icon className="h-[18px] w-[18px]" />
-            {item.label}
-          </Link>
-        );
-      })}
-    </nav>
-  );
+interface AppShellProps {
+  children: ReactNode;
 }
 
-function Brand() {
-  return (
-    <Link to="/dashboard" className="flex items-center gap-2.5 px-5 py-5">
-      <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-primary">
-        <Coins className="h-5 w-5 text-primary-foreground" />
-      </div>
-      <div className="leading-tight">
-        <p className="font-display text-[15px] font-bold text-sidebar-foreground">Smart Expense</p>
-        <p className="text-[11px] text-sidebar-foreground/50">Tracker</p>
-      </div>
-    </Link>
-  );
-}
+const NAV_ITEMS = [
+  { label: "Dashboard", to: "/dashboard", icon: LayoutDashboard },
+  { label: "AI Resume Analyzer", to: "/analyze", icon: FileText },
+  { label: "Job Description Matcher", to: "/job-match", icon: Target },
+  { label: "AI Cover Letter", to: "/cover-letter", icon: FileCheck },
+  { label: "Resume Builder", to: "/builder", icon: Layers },
+  { label: "Profile & History", to: "/profile", icon: User },
+  { label: "Admin Console", to: "/admin", icon: Shield },
+];
 
-export function AppShell({ children }: { children: ReactNode }) {
-  const [open, setOpen] = useState(false);
+export function AppShell({ children }: AppShellProps) {
   const { theme, toggleTheme } = useTheme();
-  const { data: profile } = useProfile();
-  const avatarUrl = useSignedAvatar(profile?.avatar_url);
-  const { data: isAdmin } = useIsAdmin();
   const navigate = useNavigate();
-  const qc = useQueryClient();
-
-  const handleSignOut = async () => {
-    await qc.cancelQueries();
-    qc.clear();
-    await supabase.auth.signOut();
-    navigate({ to: "/auth", replace: true });
-  };
-
-  const initials = (profile?.name || profile?.email || "U")
-    .split(" ")
-    .map((s) => s[0])
-    .join("")
-    .slice(0, 2)
-    .toUpperCase();
+  const location = useLocation();
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
-    <div className="flex min-h-screen w-full bg-background">
-      {/* Desktop sidebar */}
-      <aside className="fixed inset-y-0 left-0 z-30 hidden w-64 flex-col border-r border-sidebar-border bg-sidebar lg:flex">
-        <Brand />
-        <div className="mt-2 flex-1 overflow-y-auto">
-          <NavLinks isAdmin={isAdmin} />
-        </div>
-        <div className="border-t border-sidebar-border p-3">
-          <button
-            onClick={handleSignOut}
-            className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-sidebar-foreground/70 transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
-          >
-            <LogOut className="h-[18px] w-[18px]" />
-            Sign out
-          </button>
-        </div>
-      </aside>
-
-      <div className="flex flex-1 flex-col lg:pl-64">
-        {/* Topbar */}
-        <header className="sticky top-0 z-20 flex h-16 items-center justify-between border-b border-border bg-background/80 px-4 backdrop-blur-md lg:px-8">
-          <div className="flex items-center gap-3">
-            <Sheet open={open} onOpenChange={setOpen}>
-              <SheetTrigger asChild>
-                <Button variant="ghost" size="icon" className="lg:hidden">
-                  <Menu className="h-5 w-5" />
-                </Button>
-              </SheetTrigger>
-              <SheetContent side="left" className="w-64 border-sidebar-border bg-sidebar p-0">
-                <SheetTitle className="sr-only">Navigation</SheetTitle>
-                <Brand />
-                <div className="mt-2">
-                  <NavLinks isAdmin={isAdmin} onNavigate={() => setOpen(false)} />
-                </div>
-              </SheetContent>
-            </Sheet>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <Button variant="ghost" size="icon" onClick={toggleTheme} aria-label="Toggle theme">
-              {theme === "dark" ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
-            </Button>
-            <Link to="/settings" className="flex items-center gap-2 rounded-full pl-1">
-              <Avatar className="h-9 w-9 border border-border">
-                {avatarUrl && <AvatarImage src={avatarUrl} alt="" />}
-                <AvatarFallback className="bg-primary/15 text-sm font-semibold text-primary">
-                  {initials}
-                </AvatarFallback>
-              </Avatar>
+    <div className="min-h-screen flex flex-col bg-background text-foreground">
+      {/* Top Navbar */}
+      <header className="sticky top-0 z-40 backdrop-blur-md bg-background/80 border-b border-border">
+        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6">
+          <div className="flex items-center gap-6">
+            <Link to="/dashboard" className="flex items-center gap-2.5">
+              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-tr from-primary via-indigo-500 to-purple-600 shadow-md text-white">
+                <FileText className="h-5 w-5" />
+              </div>
+              <span className="font-display text-lg font-bold tracking-tight bg-gradient-to-r from-primary via-purple-500 to-pink-500 bg-clip-text text-transparent hidden sm:inline-block">
+                ResuMind AI
+              </span>
             </Link>
-          </div>
-        </header>
 
-        <main className="flex-1 px-4 py-6 lg:px-8 lg:py-8">{children}</main>
-      </div>
+            {/* Desktop Navigation Links */}
+            <nav className="hidden lg:flex items-center gap-1">
+              {NAV_ITEMS.map((item) => {
+                const isActive = location.pathname === item.to;
+                return (
+                  <Link
+                    key={item.to}
+                    to={item.to}
+                    className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
+                      isActive
+                        ? "bg-primary/10 text-primary font-bold"
+                        : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
+                    }`}
+                  >
+                    <item.icon className="h-4 w-4" />
+                    {item.label}
+                  </Link>
+                );
+              })}
+            </nav>
+          </div>
+
+          <div className="flex items-center gap-3">
+            {/* Quick Upload CTA */}
+            <Button
+              size="sm"
+              onClick={() => navigate({ to: "/analyze" })}
+              className="hidden sm:flex bg-gradient-to-r from-primary to-purple-600 text-white shadow-sm hover:opacity-90 text-xs font-semibold gap-1.5"
+            >
+              <Sparkles className="h-3.5 w-3.5" /> Analyze Resume
+            </Button>
+
+            {/* Theme Toggle Button */}
+            <Button variant="ghost" size="icon" onClick={toggleTheme} className="h-9 w-9">
+              {theme === "dark" ? <Sun className="h-4 w-4 text-amber-400" /> : <Moon className="h-4 w-4 text-slate-700" />}
+            </Button>
+
+            {/* User Avatar & Dropdown */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button className="flex items-center gap-2 rounded-full focus:outline-none ring-2 ring-primary/20">
+                  <Avatar className="h-8 w-8">
+                    <AvatarImage src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=250&q=80" />
+                    <AvatarFallback className="bg-primary text-primary-foreground font-bold text-xs">AM</AvatarFallback>
+                  </Avatar>
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56">
+                <DropdownMenuLabel>
+                  <div className="flex flex-col space-y-1">
+                    <p className="text-sm font-medium leading-none">Alex Morgan</p>
+                    <p className="text-xs leading-none text-muted-foreground">alex.morgan@email.com</p>
+                  </div>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => navigate({ to: "/dashboard" })}>
+                  <LayoutDashboard className="mr-2 h-4 w-4" /> Dashboard
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => navigate({ to: "/profile" })}>
+                  <User className="mr-2 h-4 w-4" /> Profile & Settings
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => navigate({ to: "/admin" })}>
+                  <Shield className="mr-2 h-4 w-4" /> Admin Console
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => navigate({ to: "/auth" })} className="text-destructive">
+                  <LogOut className="mr-2 h-4 w-4" /> Sign out
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            {/* Mobile Navigation Menu Toggle */}
+            <Button
+              variant="ghost"
+              size="icon"
+              className="lg:hidden"
+              onClick={() => setMobileOpen(!mobileOpen)}
+            >
+              {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            </Button>
+          </div>
+        </div>
+
+        {/* Mobile Dropdown Navigation */}
+        {mobileOpen && (
+          <div className="lg:hidden border-b border-border bg-card p-4 space-y-2">
+            {NAV_ITEMS.map((item) => (
+              <Link
+                key={item.to}
+                to={item.to}
+                onClick={() => setMobileOpen(false)}
+                className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium ${
+                  location.pathname === item.to ? "bg-primary/10 text-primary font-bold" : "text-muted-foreground"
+                }`}
+              >
+                <item.icon className="h-4 w-4" />
+                {item.label}
+              </Link>
+            ))}
+          </div>
+        )}
+      </header>
+
+      {/* Main Page Content */}
+      <main className="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8">{children}</main>
     </div>
   );
 }
